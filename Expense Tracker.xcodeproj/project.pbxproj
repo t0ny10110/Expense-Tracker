@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2089F6C1A6CA0FBDBFB2F65D /* Expense TrackerWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DC923E4233353742A4421D72 /* Expense TrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		556E299E45D62EDAE4A4B7BD /* Expense TrackerWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F9F47ADE8657679300A2E99 /* Expense TrackerWidgetExtension.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0A0000000000000000000021 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,16 +26,42 @@
 			remoteGlobalIDString = 0A0000000000000000000006;
 			remoteInfo = "Expense Tracker";
 		};
+		93AA1DDBFE2BB5743CB6C579 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A482E604C1997FD388E39D32;
+			remoteInfo = "Expense TrackerWidgetExtension";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		21DC815834FB6C41CD957B24 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2089F6C1A6CA0FBDBFB2F65D /* Expense TrackerWidgetExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0A0000000000000000000003 /* Expense Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Expense Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A0000000000000000000023 /* Expense TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Expense TrackerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A0000000000000000000033 /* Expense TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Expense TrackerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5299EF6C032C7E66386A27DF /* Expense TrackerWidgetExtension.entitlements */ = {isa = PBXFileReference; explicitFileType = text.plist.entitlements; lastKnownFileType = text.plist.entitlements; name = "Expense TrackerWidgetExtension.entitlements"; path = "Expense TrackerWidgetExtension.entitlements"; sourceTree = "<group>"; };
+		5A7B656DB978E5874AE0239E /* Expense Tracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Expense Tracker.entitlements"; path = "Expense Tracker/Expense Tracker.entitlements"; sourceTree = "<group>"; };
+		6F9F47ADE8657679300A2E99 /* Expense TrackerWidgetExtension.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; lastKnownFileType = sourcecode.swift; name = "Expense TrackerWidgetExtension.swift"; path = "Expense TrackerWidgetExtension.swift"; sourceTree = "<group>"; };
+		8CC4B6C44B400322A7B1BCDC /* Info.plist */ = {isa = PBXFileReference; explicitFileType = text.plist; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = "<group>"; };
+		DC923E4233353742A4421D72 /* Expense TrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; name = "Expense TrackerWidgetExtension.appex"; path = "Expense TrackerWidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0A0000000000000000000011 /* Exceptions for "Expense Tracker" folder in "Expense Tracker" target */ = {
+		0A0000000000000000000011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -43,7 +74,7 @@
 		0A0000000000000000000005 /* Expense Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0A0000000000000000000011 /* Exceptions for "Expense Tracker" folder in "Expense Tracker" target */,
+				0A0000000000000000000011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = "Expense Tracker";
 			sourceTree = "<group>";
@@ -82,6 +113,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D3E7E68B2191E2B375955032 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -92,6 +130,8 @@
 				0A0000000000000000000025 /* Expense TrackerTests */,
 				0A0000000000000000000035 /* Expense TrackerUITests */,
 				0A0000000000000000000004 /* Products */,
+				7C76F7198C3BBA3F86B4DB80 /* Expense TrackerWidgetExtension */,
+				5A7B656DB978E5874AE0239E /* Expense Tracker.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -101,8 +141,20 @@
 				0A0000000000000000000003 /* Expense Tracker.app */,
 				0A0000000000000000000023 /* Expense TrackerTests.xctest */,
 				0A0000000000000000000033 /* Expense TrackerUITests.xctest */,
+				DC923E4233353742A4421D72 /* Expense TrackerWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7C76F7198C3BBA3F86B4DB80 /* Expense TrackerWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				6F9F47ADE8657679300A2E99 /* Expense TrackerWidgetExtension.swift */,
+				8CC4B6C44B400322A7B1BCDC /* Info.plist */,
+				5299EF6C032C7E66386A27DF /* Expense TrackerWidgetExtension.entitlements */,
+			);
+			name = "Expense TrackerWidgetExtension";
+			path = "Expense TrackerWidgetExtension";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -115,10 +167,12 @@
 				0A0000000000000000000007 /* Sources */,
 				0A0000000000000000000008 /* Frameworks */,
 				0A0000000000000000000009 /* Resources */,
+				21DC815834FB6C41CD957B24 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B41D4035B50C1836FCBFB15A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0A0000000000000000000005 /* Expense Tracker */,
@@ -176,6 +230,25 @@
 			productReference = 0A0000000000000000000033 /* Expense TrackerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		A482E604C1997FD388E39D32 /* Expense TrackerWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AD305552301AC2789EF6927D /* Build configuration list for PBXNativeTarget "Expense TrackerWidgetExtension" */;
+			buildPhases = (
+				176542B3BD280D1AA31B2771 /* Sources */,
+				D3E7E68B2191E2B375955032 /* Frameworks */,
+				DA103A90ECE6CF3E273C8E18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Expense TrackerWidgetExtension";
+			packageProductDependencies = (
+			);
+			productName = "Expense TrackerWidgetExtension";
+			productReference = DC923E4233353742A4421D72 /* Expense TrackerWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -216,6 +289,7 @@
 				0A0000000000000000000006 /* Expense Tracker */,
 				0A0000000000000000000026 /* Expense TrackerTests */,
 				0A0000000000000000000036 /* Expense TrackerUITests */,
+				A482E604C1997FD388E39D32 /* Expense TrackerWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -236,6 +310,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		0A0000000000000000000039 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA103A90ECE6CF3E273C8E18 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -266,6 +347,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		176542B3BD280D1AA31B2771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				556E299E45D62EDAE4A4B7BD /* Expense TrackerWidgetExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -278,6 +367,12 @@
 			isa = PBXTargetDependency;
 			target = 0A0000000000000000000006 /* Expense Tracker */;
 			targetProxy = 0A0000000000000000000031 /* PBXContainerItemProxy */;
+		};
+		B41D4035B50C1836FCBFB15A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Expense TrackerWidgetExtension";
+			target = A482E604C1997FD388E39D32 /* Expense TrackerWidgetExtension */;
+			targetProxy = 93AA1DDBFE2BB5743CB6C579 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -406,6 +501,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Expense Tracker/Expense Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -439,6 +535,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Expense Tracker/Expense Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -537,6 +634,66 @@
 			};
 			name = Release;
 		};
+		8BDA4FF9E8FB5C7949219A1E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = "Expense TrackerWidgetExtension/Expense TrackerWidgetExtension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_LANGUAGE = en;
+				EXECUTABLE_NAME = "$(PRODUCT_NAME)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Expense TrackerWidgetExtension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.organizationName.Expense-Tracker.expensetrackerwidgetextension";
+				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
+				PRODUCT_MODULE_NAME = Expense_TrackerWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C1B141AE677A2C2C60ACFC34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = "Expense TrackerWidgetExtension/Expense TrackerWidgetExtension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_LANGUAGE = en;
+				EXECUTABLE_NAME = "$(PRODUCT_NAME)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Expense TrackerWidgetExtension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.organizationName.Expense-Tracker.expensetrackerwidgetextension";
+				PRODUCT_BUNDLE_PACKAGE_TYPE = "XPC!";
+				PRODUCT_MODULE_NAME = Expense_TrackerWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -572,6 +729,15 @@
 			buildConfigurations = (
 				0A000000000000000000003F /* Debug */,
 				0A0000000000000000000040 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AD305552301AC2789EF6927D /* Build configuration list for PBXNativeTarget "Expense TrackerWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BDA4FF9E8FB5C7949219A1E /* Debug */,
+				C1B141AE677A2C2C60ACFC34 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
