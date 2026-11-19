@@ -72,13 +72,56 @@ struct Expense_TrackerWidgetExtensionProvider: TimelineProvider {
 }
 
 private enum WidgetPalette {
-    static let mint = Color(red: 0.06, green: 0.48, blue: 0.18)
-    static let brightMint = Color(red: 0.69, green: 0.91, blue: 0.22)
+    static let mint = Color(red: 0.04, green: 0.50, blue: 0.22)
+    static let brightMint = Color(red: 0.67, green: 0.96, blue: 0.27)
+    static let gold = Color(red: 0.98, green: 0.72, blue: 0.31)
+    static let neonCyan = Color(red: 0.16, green: 0.86, blue: 0.98)
 
     static func background(for colorScheme: ColorScheme) -> Color {
         colorScheme == .dark
-            ? Color(red: 0.035, green: 0.045, blue: 0.035)
-            : Color(red: 0.96, green: 0.94, blue: 0.87)
+            ? Color(red: 0.035, green: 0.035, blue: 0.09)
+            : Color(red: 0.95, green: 0.93, blue: 0.98)
+    }
+}
+
+private struct WidgetCashStackMark: View {
+    let size: CGFloat
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                .fill(Color(red: 0.04, green: 0.42, blue: 0.18))
+                .frame(width: size * 0.78, height: size * 0.45)
+                .rotationEffect(.degrees(-15))
+                .offset(x: -size * 0.10, y: size * 0.10)
+
+            RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                .fill(Color(red: 0.14, green: 0.68, blue: 0.29))
+                .frame(width: size * 0.78, height: size * 0.45)
+                .rotationEffect(.degrees(12))
+                .offset(x: size * 0.08, y: -size * 0.06)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .fill(LinearGradient(colors: [WidgetPalette.brightMint, WidgetPalette.mint], startPoint: .topLeading, endPoint: .bottomTrailing))
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .strokeBorder(WidgetPalette.neonCyan.opacity(0.85), lineWidth: max(1, size * 0.04))
+                Capsule()
+                    .fill(WidgetPalette.gold)
+                    .frame(width: size * 0.12)
+                Circle()
+                    .fill(Color(red: 0.06, green: 0.47, blue: 0.19))
+                    .frame(width: size * 0.28, height: size * 0.28)
+                Text("₹")
+                    .font(.system(size: max(7, size * 0.18), weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: size * 0.80, height: size * 0.48)
+            .rotationEffect(.degrees(-3))
+            .offset(x: size * 0.02, y: size * 0.02)
+        }
+        .frame(width: size, height: size)
+        .accessibilityHidden(true)
     }
 }
 
@@ -120,7 +163,7 @@ struct Expense_TrackerWidgetExtensionEntryView: View {
     private var smallWidget: some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 6) {
-                Image(systemName: "banknote.fill")
+                WidgetCashStackMark(size: 18)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(WidgetPalette.mint)
                 Text("CASH STASH")
@@ -178,7 +221,7 @@ struct Expense_TrackerWidgetExtensionEntryView: View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
-                    Image(systemName: "banknote.fill")
+                    WidgetCashStackMark(size: 18)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(WidgetPalette.mint)
                     Text("CASH LEFT THIS MONTH")

@@ -2,18 +2,89 @@ import SwiftUI
 import WidgetKit
 
 private enum TrackerStyle {
-    static let mint = Color(red: 0.06, green: 0.48, blue: 0.18)
-    static let brightMint = Color(red: 0.69, green: 0.91, blue: 0.22)
-    static let gold = Color(red: 0.91, green: 0.68, blue: 0.22)
-    static let backgroundLight = Color(red: 0.96, green: 0.94, blue: 0.87)
-    static let backgroundDark = Color(red: 0.035, green: 0.045, blue: 0.035)
+    static let mint = Color(red: 0.04, green: 0.50, blue: 0.22)
+    static let brightMint = Color(red: 0.67, green: 0.96, blue: 0.27)
+    static let gold = Color(red: 0.98, green: 0.72, blue: 0.31)
+    static let neonCyan = Color(red: 0.16, green: 0.86, blue: 0.98)
+    static let neonPink = Color(red: 0.98, green: 0.25, blue: 0.57)
+    static let backgroundLight = Color(red: 0.95, green: 0.93, blue: 0.98)
+    static let backgroundDark = Color(red: 0.035, green: 0.035, blue: 0.09)
 
     static func background(for scheme: ColorScheme) -> Color {
         scheme == .dark ? backgroundDark : backgroundLight
     }
 
     static func card(for scheme: ColorScheme) -> Color {
-        scheme == .dark ? Color(red: 0.085, green: 0.10, blue: 0.075) : Color(red: 1.0, green: 0.99, blue: 0.95)
+        scheme == .dark ? Color(red: 0.09, green: 0.08, blue: 0.16) : Color(red: 1.0, green: 0.99, blue: 1.0)
+    }
+}
+
+private struct CashStackMark: View {
+    let size: CGFloat
+
+    init(size: CGFloat = 40) {
+        self.size = size
+    }
+
+    var body: some View {
+        ZStack {
+            bill(color: Color(red: 0.04, green: 0.42, blue: 0.18))
+                .rotationEffect(.degrees(-16))
+                .offset(x: -size * 0.10, y: size * 0.10)
+
+            bill(color: Color(red: 0.14, green: 0.68, blue: 0.29))
+                .rotationEffect(.degrees(12))
+                .offset(x: size * 0.08, y: -size * 0.06)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .fill(LinearGradient(colors: [TrackerStyle.brightMint, TrackerStyle.mint], startPoint: .topLeading, endPoint: .bottomTrailing))
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .strokeBorder(TrackerStyle.neonCyan.opacity(0.8), lineWidth: max(1, size * 0.025))
+                HStack {
+                    Capsule().fill(TrackerStyle.gold).frame(width: max(2, size * 0.08))
+                    Spacer(minLength: 0)
+                    Capsule().fill(TrackerStyle.gold).frame(width: max(2, size * 0.08))
+                }
+                .padding(.horizontal, size * 0.10)
+                Circle()
+                    .fill(Color(red: 0.06, green: 0.47, blue: 0.19))
+                    .frame(width: size * 0.25, height: size * 0.25)
+                Circle()
+                    .strokeBorder(Color.white.opacity(0.85), lineWidth: max(1, size * 0.02))
+                    .frame(width: size * 0.25, height: size * 0.25)
+                Text("₹")
+                    .font(.system(size: max(7, size * 0.16), weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: size * 0.80, height: size * 0.48)
+            .rotationEffect(.degrees(-3))
+            .offset(x: size * 0.02, y: size * 0.02)
+        }
+        .frame(width: size, height: size)
+        .shadow(color: TrackerStyle.brightMint.opacity(0.22), radius: size * 0.10, x: 0, y: size * 0.04)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Stack of cash")
+    }
+
+    private func bill(color: Color) -> some View {
+        RoundedRectangle(cornerRadius: size * 0.10, style: .continuous)
+            .fill(color)
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.10, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.62), lineWidth: max(1, size * 0.018))
+            }
+            .overlay {
+                HStack {
+                    Circle().strokeBorder(Color.white.opacity(0.65), lineWidth: max(1, size * 0.018))
+                        .frame(width: size * 0.13, height: size * 0.13)
+                    Spacer(minLength: 0)
+                    Circle().strokeBorder(Color.white.opacity(0.65), lineWidth: max(1, size * 0.018))
+                        .frame(width: size * 0.13, height: size * 0.13)
+                }
+                .padding(.horizontal, size * 0.08)
+            }
+            .frame(width: size * 0.78, height: size * 0.45)
     }
 }
 
@@ -54,13 +125,13 @@ private enum ExpenseCategory: String, CaseIterable, Codable, Identifiable {
 
     var color: Color {
         switch self {
-        case .food: Color(red: 0.25, green: 0.65, blue: 0.28)
-        case .transport: Color(red: 0.82, green: 0.61, blue: 0.19)
-        case .shopping: Color(red: 0.58, green: 0.76, blue: 0.20)
-        case .bills: Color(red: 0.83, green: 0.48, blue: 0.16)
-        case .health: Color(red: 0.78, green: 0.27, blue: 0.22)
-        case .entertainment: Color(red: 0.31, green: 0.48, blue: 0.70)
-        case .other: Color(red: 0.46, green: 0.52, blue: 0.44)
+        case .food: Color(red: 0.13, green: 0.62, blue: 0.31)
+        case .transport: Color(red: 0.12, green: 0.65, blue: 0.83)
+        case .shopping: Color(red: 0.84, green: 0.30, blue: 0.58)
+        case .bills: Color(red: 0.82, green: 0.57, blue: 0.18)
+        case .health: Color(red: 0.80, green: 0.28, blue: 0.37)
+        case .entertainment: Color(red: 0.48, green: 0.38, blue: 0.78)
+        case .other: Color(red: 0.46, green: 0.49, blue: 0.59)
         }
     }
 }
@@ -155,6 +226,19 @@ private enum DashboardSheet: Identifiable {
     }
 }
 
+private enum DashboardTab {
+    case home
+    case insights
+}
+
+private struct CategorySpending: Identifiable {
+    let category: ExpenseCategory
+    let total: Double
+    let share: Double
+
+    var id: String { category.rawValue }
+}
+
 private enum MoneyFormat {
     static let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -178,6 +262,8 @@ struct ContentView: View {
 
     @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: Date())?.start ?? Date()
     @State private var activeSheet: DashboardSheet?
+    @State private var selectedTab: DashboardTab = .home
+    @State private var selectedInsightCategory: ExpenseCategory?
 
     private let calendar = Calendar.current
 
@@ -235,17 +321,82 @@ struct ContentView: View {
         store.monthlyBudget - monthSpent
     }
 
+    private var previousMonth: Date {
+        calendar.date(byAdding: .month, value: -1, to: selectedMonth) ?? selectedMonth
+    }
+
+    private var previousMonthSpent: Double {
+        store.expenses
+            .filter { calendar.isDate($0.date, equalTo: previousMonth, toGranularity: .month) }
+            .reduce(0) { $0 + $1.amount }
+    }
+
+    private var monthChange: Double? {
+        guard previousMonthSpent > 0 else { return nil }
+        return (monthSpent - previousMonthSpent) / previousMonthSpent * 100
+    }
+
+    private var monthChangeCaption: String {
+        guard let monthChange else { return "No comparison yet" }
+        let monthName = previousMonth.formatted(.dateTime.month(.wide))
+        if abs(monthChange) < 0.5 { return "Same as \(monthName)" }
+        let amount = Int(abs(monthChange).rounded())
+        return "\(amount)% \(monthChange < 0 ? "less" : "more") than \(monthName)"
+    }
+
+    private var monthChangeSymbol: String {
+        guard let monthChange else { return "chart.bar" }
+        if monthChange < -0.5 { return "arrow.down" }
+        if monthChange > 0.5 { return "arrow.up" }
+        return "equal"
+    }
+
+    private var categorySpendings: [CategorySpending] {
+        ExpenseCategory.allCases.compactMap { category in
+            let total = monthExpenses
+                .filter { $0.category == category }
+                .reduce(0) { $0 + $1.amount }
+            guard total > 0 else { return nil }
+            return CategorySpending(category: category, total: total, share: monthSpent > 0 ? total / monthSpent : 0)
+        }
+        .sorted {
+            if $0.total == $1.total { return $0.category.title < $1.category.title }
+            return $0.total > $1.total
+        }
+    }
+
+    private var displayedInsightCategory: ExpenseCategory? {
+        if let selectedInsightCategory,
+           categorySpendings.contains(where: { $0.category == selectedInsightCategory }) {
+            return selectedInsightCategory
+        }
+        return categorySpendings.first?.category
+    }
+
+    private var selectedCategoryExpenses: [ExpenseEntry] {
+        guard let displayedInsightCategory else { return [] }
+        return monthExpenses.filter { $0.category == displayedInsightCategory }
+    }
+
     var body: some View {
         ZStack {
             TrackerStyle.background(for: colorScheme).ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 23) {
-                    header
-                    monthSelector
-                    budgetCard
-                    metricsCard
-                    recentActivity
+                    if selectedTab == .home {
+                        header
+                        monthSelector
+                        budgetCard
+                        metricsCard
+                        recentActivity
+                    } else {
+                        insightsHeader
+                        monthSelector
+                        insightsSummaryCard
+                        categorySection
+                        selectedCategoryActivity
+                    }
                 }
                 .padding(.horizontal, 22)
                 .padding(.top, 12)
@@ -281,6 +432,7 @@ struct ContentView: View {
         .preferredColorScheme(preferredScheme)
         .tint(TrackerStyle.mint)
         .animation(.snappy(duration: 0.25), value: selectedMonth)
+        .animation(.snappy(duration: 0.25), value: selectedTab)
     }
 
     private var header: some View {
@@ -296,10 +448,7 @@ struct ContentView: View {
                         .tracking(-0.8)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
-                    Image(systemName: "banknote.fill")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(TrackerStyle.gold)
-                        .rotationEffect(.degrees(-12))
+                    CashStackMark(size: 30)
                 }
 
                 Text("Make every move count.")
@@ -398,11 +547,15 @@ struct ContentView: View {
                 Spacer(minLength: 4)
 
                 VStack(spacing: 5) {
-                    Image(systemName: monthSpent > store.monthlyBudget ? "exclamationmark" : "banknote.fill")
-                        .font(.system(size: 17, weight: .medium))
-                        .foregroundStyle(TrackerStyle.mint)
-                        .frame(width: 42, height: 42)
-                        .background(TrackerStyle.mint.opacity(0.12), in: Circle())
+                    if monthSpent > store.monthlyBudget {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(TrackerStyle.neonPink)
+                            .frame(width: 42, height: 42)
+                            .background(TrackerStyle.neonPink.opacity(0.14), in: Circle())
+                    } else {
+                        CashStackMark(size: 46)
+                    }
 
                     Text("\(usedPercentage)%")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
@@ -442,8 +595,8 @@ struct ContentView: View {
         .background {
             LinearGradient(
                 colors: colorScheme == .dark
-                    ? [Color(red: 0.08, green: 0.22, blue: 0.08), Color(red: 0.13, green: 0.16, blue: 0.07)]
-                    : [Color(red: 0.89, green: 0.95, blue: 0.76), Color(red: 0.98, green: 0.92, blue: 0.70)],
+                    ? [Color(red: 0.025, green: 0.22, blue: 0.15), Color(red: 0.10, green: 0.055, blue: 0.23)]
+                    : [Color(red: 0.86, green: 0.98, blue: 0.84), Color(red: 0.94, green: 0.87, blue: 0.99)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -542,27 +695,232 @@ struct ContentView: View {
         }
     }
 
+    private var insightsHeader: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Spending insights")
+                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .tracking(-0.7)
+            Text("Understand where your money went.")
+                .font(.system(size: 16))
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, 8)
+    }
+
+    private var insightsSummaryCard: some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("TOTAL SPENT")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .tracking(0.8)
+                    .foregroundStyle(.white.opacity(0.78))
+
+                Text(MoneyFormat.string(monthSpent))
+                    .font(.system(size: 42, weight: .bold, design: .rounded))
+                    .tracking(-1.5)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                    .contentTransition(.numericText())
+
+                HStack(spacing: 9) {
+                    Image(systemName: monthChangeSymbol)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 34, height: 34)
+                        .background(TrackerStyle.brightMint.opacity(0.35), in: Circle())
+                    Text(monthChangeCaption)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+            }
+
+            Spacer(minLength: 0)
+            insightsMiniChart
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 19)
+        .frame(minHeight: 174)
+        .background {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.09, green: 0.045, blue: 0.25), Color(red: 0.015, green: 0.25, blue: 0.32)]
+                    : [Color(red: 0.11, green: 0.06, blue: 0.29), Color(red: 0.02, green: 0.35, blue: 0.41)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 25, style: .continuous).strokeBorder(.white.opacity(0.10)))
+        .shadow(color: Color(red: 0.03, green: 0.28, blue: 0.15).opacity(colorScheme == .dark ? 0.22 : 0.15), radius: 18, x: 0, y: 8)
+    }
+
+    private var insightsMiniChart: some View {
+        HStack(alignment: .bottom, spacing: 6) {
+            ForEach(Array(categorySpendings.prefix(5).enumerated()), id: \.element.id) { index, spending in
+                Capsule()
+                    .fill(index == 0 ? TrackerStyle.brightMint : Color.white.opacity(0.38))
+                    .frame(width: 9, height: max(12, CGFloat(spending.share) * 82))
+            }
+        }
+        .frame(width: 82, height: 76, alignment: .bottomTrailing)
+        .accessibilityHidden(true)
+    }
+
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 13) {
+            Text("By category")
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .tracking(-0.4)
+
+            if categorySpendings.isEmpty {
+                VStack(spacing: 9) {
+                    Image(systemName: "chart.pie.fill")
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundStyle(TrackerStyle.mint)
+                    Text("No spending yet")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    Text("Add expenses this month to see your category breakdown.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 25)
+                .padding(.horizontal, 20)
+                .background(TrackerStyle.card(for: colorScheme), in: RoundedRectangle(cornerRadius: 23, style: .continuous))
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(categorySpendings.enumerated()), id: \.element.id) { index, spending in
+                        Button {
+                            selectedInsightCategory = spending.category
+                        } label: {
+                            categorySpendingRow(spending, isSelected: displayedInsightCategory == spending.category)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(spending.category.title), \(MoneyFormat.string(spending.total)), \(Int((spending.share * 100).rounded())) percent. Show transactions.")
+                        .accessibilityAddTraits(displayedInsightCategory == spending.category ? .isSelected : [])
+
+                        if index < categorySpendings.count - 1 {
+                            Divider()
+                                .padding(.leading, 70)
+                                .padding(.trailing, 12)
+                        }
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(TrackerStyle.card(for: colorScheme).opacity(colorScheme == .dark ? 0.92 : 0.88), in: RoundedRectangle(cornerRadius: 23, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 23, style: .continuous).strokeBorder(.white.opacity(colorScheme == .dark ? 0.05 : 0.8)))
+                .shadow(color: .black.opacity(colorScheme == .dark ? 0.08 : 0.035), radius: 16, x: 0, y: 6)
+            }
+        }
+    }
+
+    private func categorySpendingRow(_ spending: CategorySpending, isSelected: Bool) -> some View {
+        HStack(spacing: 11) {
+            Image(systemName: spending.category.symbol)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(spending.category.color)
+                .frame(width: 48, height: 48)
+                .background(spending.category.color.opacity(colorScheme == .dark ? 0.16 : 0.10), in: Circle())
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 5) {
+                    Text(spending.category.title)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Spacer(minLength: 2)
+                    Text(MoneyFormat.string(spending.total))
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                    Text("\(Int((spending.share * 100).rounded()))%")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 34, alignment: .trailing)
+                }
+
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(TrackerStyle.mint.opacity(colorScheme == .dark ? 0.20 : 0.12))
+                        Capsule()
+                            .fill(LinearGradient(colors: [TrackerStyle.mint, TrackerStyle.brightMint], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geometry.size.width * spending.share)
+                    }
+                }
+                .frame(height: 8)
+            }
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 11)
+        .background(isSelected ? TrackerStyle.mint.opacity(colorScheme == .dark ? 0.10 : 0.06) : .clear, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private var selectedCategoryActivity: some View {
+        if let category = displayedInsightCategory {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(category.title)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .tracking(-0.4)
+                Text("Transactions")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(.secondary)
+
+                VStack(spacing: 0) {
+                    ForEach(Array(selectedCategoryExpenses.enumerated()), id: \.element.id) { index, expense in
+                        Button {
+                            activeSheet = .expense(expense)
+                        } label: {
+                            ExpenseRow(expense: expense, showsChevron: true)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 14)
+
+                        if index < selectedCategoryExpenses.count - 1 {
+                            Divider().padding(.leading, 80).padding(.trailing, 15)
+                        }
+                    }
+                }
+                .background(TrackerStyle.card(for: colorScheme).opacity(colorScheme == .dark ? 0.92 : 0.88), in: RoundedRectangle(cornerRadius: 23, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 23, style: .continuous).strokeBorder(.white.opacity(colorScheme == .dark ? 0.05 : 0.8)))
+            }
+        }
+    }
+
     private var bottomBar: some View {
-        HStack(spacing: 0) {
-            bottomAction(title: "Home", symbol: "house.fill", selected: true) { }
-            Spacer(minLength: 8)
+        HStack(spacing: 4) {
+            bottomAction(title: "Home", symbol: "house.fill", selected: selectedTab == .home) {
+                selectedTab = .home
+            }
+            bottomAction(title: "Insights", symbol: "chart.bar.fill", selected: selectedTab == .insights) {
+                selectedTab = .insights
+            }
             Button {
                 activeSheet = .expense(nil)
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 26, weight: .medium))
+                    .font(.system(size: 25, weight: .medium))
                     .foregroundStyle(.white)
-                    .frame(width: 62, height: 62)
+                    .frame(width: 58, height: 58)
                     .background(LinearGradient(colors: [TrackerStyle.mint, TrackerStyle.brightMint], startPoint: .topLeading, endPoint: .bottomTrailing), in: Circle())
                     .shadow(color: TrackerStyle.mint.opacity(0.28), radius: 12, x: 0, y: 7)
             }
             .accessibilityLabel("Add expense")
-            Spacer(minLength: 8)
             bottomAction(title: "Activity", symbol: "list.bullet", selected: false) {
                 activeSheet = .transactions
             }
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 10)
         .frame(height: 76)
         .background(.ultraThinMaterial, in: Capsule())
         .overlay(Capsule().strokeBorder(.white.opacity(colorScheme == .dark ? 0.08 : 0.78)))
@@ -578,10 +936,10 @@ struct ContentView: View {
                 Image(systemName: symbol)
                     .font(.system(size: 20, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 10, weight: selected ? .semibold : .medium))
+                    .font(.system(size: 9, weight: selected ? .semibold : .medium))
             }
             .foregroundStyle(selected ? TrackerStyle.mint : Color.secondary)
-            .frame(width: 64, height: 58)
+            .frame(width: 54, height: 58)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
