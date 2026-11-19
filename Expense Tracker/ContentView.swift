@@ -2,17 +2,18 @@ import SwiftUI
 import WidgetKit
 
 private enum TrackerStyle {
-    static let mint = Color(red: 0.04, green: 0.61, blue: 0.43)
-    static let brightMint = Color(red: 0.20, green: 0.82, blue: 0.62)
-    static let backgroundLight = Color(red: 0.965, green: 0.965, blue: 0.95)
-    static let backgroundDark = Color(red: 0.055, green: 0.075, blue: 0.073)
+    static let mint = Color(red: 0.06, green: 0.48, blue: 0.18)
+    static let brightMint = Color(red: 0.69, green: 0.91, blue: 0.22)
+    static let gold = Color(red: 0.91, green: 0.68, blue: 0.22)
+    static let backgroundLight = Color(red: 0.96, green: 0.94, blue: 0.87)
+    static let backgroundDark = Color(red: 0.035, green: 0.045, blue: 0.035)
 
     static func background(for scheme: ColorScheme) -> Color {
         scheme == .dark ? backgroundDark : backgroundLight
     }
 
     static func card(for scheme: ColorScheme) -> Color {
-        scheme == .dark ? Color(red: 0.105, green: 0.13, blue: 0.125) : .white
+        scheme == .dark ? Color(red: 0.085, green: 0.10, blue: 0.075) : Color(red: 1.0, green: 0.99, blue: 0.95)
     }
 }
 
@@ -53,13 +54,13 @@ private enum ExpenseCategory: String, CaseIterable, Codable, Identifiable {
 
     var color: Color {
         switch self {
-        case .food: Color(red: 0.08, green: 0.65, blue: 0.47)
-        case .transport: Color(red: 0.20, green: 0.52, blue: 0.83)
-        case .shopping: Color(red: 0.60, green: 0.42, blue: 0.82)
-        case .bills: Color(red: 0.91, green: 0.59, blue: 0.20)
-        case .health: Color(red: 0.90, green: 0.36, blue: 0.40)
-        case .entertainment: Color(red: 0.88, green: 0.46, blue: 0.28)
-        case .other: Color(red: 0.48, green: 0.55, blue: 0.58)
+        case .food: Color(red: 0.25, green: 0.65, blue: 0.28)
+        case .transport: Color(red: 0.82, green: 0.61, blue: 0.19)
+        case .shopping: Color(red: 0.58, green: 0.76, blue: 0.20)
+        case .bills: Color(red: 0.83, green: 0.48, blue: 0.16)
+        case .health: Color(red: 0.78, green: 0.27, blue: 0.22)
+        case .entertainment: Color(red: 0.31, green: 0.48, blue: 0.70)
+        case .other: Color(red: 0.46, green: 0.52, blue: 0.44)
         }
     }
 }
@@ -290,16 +291,18 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
 
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(monthSpent > store.monthlyBudget ? "A little over budget" : "You're on track")
+                    Text(monthSpent > store.monthlyBudget ? "Cash is getting tight" : "You're stacking cash")
                         .font(.system(size: 29, weight: .bold, design: .rounded))
                         .tracking(-0.8)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
-                    Text("🌱")
-                        .font(.system(size: 26))
+                    Image(systemName: "banknote.fill")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(TrackerStyle.gold)
+                        .rotationEffect(.degrees(-12))
                 }
 
-                Text("Small steps make a big future.")
+                Text("Make every move count.")
                     .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(.secondary)
                     .padding(.top, 2)
@@ -378,7 +381,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 17) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 7) {
-                    Text("LEFT THIS MONTH")
+                    Text("CASH LEFT THIS MONTH")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .tracking(0.8)
                         .foregroundStyle(.secondary)
@@ -395,7 +398,7 @@ struct ContentView: View {
                 Spacer(minLength: 4)
 
                 VStack(spacing: 5) {
-                    Image(systemName: monthSpent > store.monthlyBudget ? "exclamationmark" : "leaf.fill")
+                    Image(systemName: monthSpent > store.monthlyBudget ? "exclamationmark" : "banknote.fill")
                         .font(.system(size: 17, weight: .medium))
                         .foregroundStyle(TrackerStyle.mint)
                         .frame(width: 42, height: 42)
@@ -439,8 +442,8 @@ struct ContentView: View {
         .background {
             LinearGradient(
                 colors: colorScheme == .dark
-                    ? [Color(red: 0.09, green: 0.24, blue: 0.19), Color(red: 0.10, green: 0.17, blue: 0.15)]
-                    : [Color(red: 0.88, green: 0.97, blue: 0.91), Color(red: 0.92, green: 0.98, blue: 0.94)],
+                    ? [Color(red: 0.08, green: 0.22, blue: 0.08), Color(red: 0.13, green: 0.16, blue: 0.07)]
+                    : [Color(red: 0.89, green: 0.95, blue: 0.76), Color(red: 0.98, green: 0.92, blue: 0.70)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )

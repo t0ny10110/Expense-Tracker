@@ -72,13 +72,13 @@ struct Expense_TrackerWidgetExtensionProvider: TimelineProvider {
 }
 
 private enum WidgetPalette {
-    static let mint = Color(red: 0.04, green: 0.61, blue: 0.43)
-    static let brightMint = Color(red: 0.20, green: 0.82, blue: 0.62)
+    static let mint = Color(red: 0.06, green: 0.48, blue: 0.18)
+    static let brightMint = Color(red: 0.69, green: 0.91, blue: 0.22)
 
     static func background(for colorScheme: ColorScheme) -> Color {
         colorScheme == .dark
-            ? Color(red: 0.075, green: 0.10, blue: 0.095)
-            : Color(red: 0.97, green: 0.98, blue: 0.96)
+            ? Color(red: 0.035, green: 0.045, blue: 0.035)
+            : Color(red: 0.96, green: 0.94, blue: 0.87)
     }
 }
 
@@ -120,10 +120,10 @@ struct Expense_TrackerWidgetExtensionEntryView: View {
     private var smallWidget: some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 6) {
-                Image(systemName: "leaf.fill")
+                Image(systemName: "banknote.fill")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(WidgetPalette.mint)
-                Text("THIS MONTH")
+                Text("CASH STASH")
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .tracking(0.6)
                     .foregroundStyle(.secondary)
@@ -178,10 +178,10 @@ struct Expense_TrackerWidgetExtensionEntryView: View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
-                    Image(systemName: "leaf.fill")
+                    Image(systemName: "banknote.fill")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(WidgetPalette.mint)
-                    Text("LEFT THIS MONTH")
+                    Text("CASH LEFT THIS MONTH")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .tracking(0.65)
                         .foregroundStyle(.secondary)
