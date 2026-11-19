@@ -149,9 +149,11 @@ private struct ExpenseEntry: Identifiable, Codable, Equatable {
 private final class ExpenseStore: ObservableObject {
     @Published private(set) var monthlyBudget: Double
     @Published private(set) var expenses: [ExpenseEntry]
+    @Published private(set) var categoryBudgets: [String: [String: Double]]
 
     private let budgetKey = "personalExpense.monthlyBudget"
     private let expensesKey = "personalExpense.expenses"
+    private let categoryBudgetsKey = "personalExpense.categoryBudgets"
     private let sharedDefaults: UserDefaults
     private let appGroupIdentifier = "group.com.organizationName.Expense-Tracker.shared"
 
@@ -180,6 +182,50 @@ private final class ExpenseStore: ObservableObject {
         } else {
             expenses = []
         }
+
+        let savedCategoryBudgets = defaults.data(forKey: categoryBudgetsKey)
+            ?? standardDefaults.data(forKey: categoryBudgetsKey)
+        if let savedCategoryBudgets,
+           let decodedBudgets = try? JSONDecoder().decode([String: [String: Double]].self, from: savedCategoryBudgets) {
+            categoryBudgets = decodedBudgets
+            if defaults.data(forKey: categoryBudgetsKey) == nil {
+                defaults.set(savedCategoryBudgets, forKey: categoryBudgetsKey)
+            }
+        } else {
+            categoryBudgets = [:]
+        }
+    }
+
+    func categoryLimit(for category: ExpenseCategory, month: Date) -> Double? {
+        categoryBudgets[monthIdentifier(for: month)]?[category.rawValue]
+    }
+
+    func setCategoryLimit(_ amount: Double?, for category: ExpenseCategory, month: Date) {
+        let monthKey = monthIdentifier(for: month)
+        var limits = categoryBudgets[monthKey] ?? [:]
+        if let amount, amount > 0 {
+            limits[category.rawValue] = amount
+        } else {
+            limits.removeValue(forKey: category.rawValue)
+        }
+
+        if limits.isEmpty {
+            categoryBudgets.removeValue(forKey: monthKey)
+        } else {
+            categoryBudgets[monthKey] = limits
+        }
+        persistCategoryBudgets()
+    }
+
+    private func monthIdentifier(for date: Date) -> String {
+        let components = Calendar.current.dateComponents([.year, .month], from: date)
+        return String(format: "%04d-%02d", components.year ?? 0, components.month ?? 0)
+    }
+
+    private func persistCategoryBudgets() {
+        guard let data = try? JSONEncoder().encode(categoryBudgets) else { return }
+        sharedDefaults.set(data, forKey: categoryBudgetsKey)
+        UserDefaults.standard.set(data, forKey: categoryBudgetsKey)
     }
 
     func setMonthlyBudget(_ amount: Double) {
@@ -216,12 +262,14 @@ private enum DashboardSheet: Identifiable {
     case settings
     case expense(ExpenseEntry?)
     case transactions
+    case categoryBudget(ExpenseCategory)
 
     var id: String {
         switch self {
         case .settings: "settings"
         case .expense(let expense): "expense-\(expense?.id.uuidString ?? "new")"
         case .transactions: "transactions"
+        case .categoryBudget(let category): "category-budget-\(category.rawValue)"
         }
     }
 }
@@ -229,6 +277,7 @@ private enum DashboardSheet: Identifiable {
 private enum DashboardTab {
     case home
     case insights
+    case categoryBudgets
 }
 
 private struct CategorySpending: Identifiable {
@@ -378,6 +427,25 @@ struct ContentView: View {
         return monthExpenses.filter { $0.category == displayedInsightCategory }
     }
 
+    private var totalCategoryLimits: Double {
+        ExpenseCategory.allCases.reduce(0) { total, category in
+            total + (store.categoryLimit(for: category, month: selectedMonth) ?? 0)
+        }
+    }
+
+    private var remainingAcrossCategoryLimits: Double {
+        ExpenseCategory.allCases.reduce(0) { total, category in
+            guard let limit = store.categoryLimit(for: category, month: selectedMonth) else { return total }
+            return total + limit - categorySpending(for: category)
+        }
+    }
+
+    private func categorySpending(for category: ExpenseCategory) -> Double {
+        monthExpenses
+            .filter { $0.category == category }
+            .reduce(0) { $0 + $1.amount }
+    }
+
     var body: some View {
         ZStack {
             TrackerStyle.background(for: colorScheme).ignoresSafeArea()
@@ -390,12 +458,17 @@ struct ContentView: View {
                         budgetCard
                         metricsCard
                         recentActivity
-                    } else {
+                    } else if selectedTab == .insights {
                         insightsHeader
                         monthSelector
                         insightsSummaryCard
                         categorySection
                         selectedCategoryActivity
+                    } else {
+                        categoryBudgetsHeader
+                        monthSelector
+                        categoryBudgetSummaryCard
+                        categoryBudgetList
                     }
                 }
                 .padding(.horizontal, 22)
@@ -423,6 +496,13 @@ struct ContentView: View {
                         expenses: monthExpenses,
                         onSave: store.save,
                         onDelete: store.delete
+                    )
+                case .categoryBudget(let category):
+                    CategoryBudgetEditorSheet(
+                        category: category,
+                        currentLimit: store.categoryLimit(for: category, month: selectedMonth),
+                        onSave: { store.setCategoryLimit($0, for: category, month: selectedMonth) },
+                        onRemove: { store.setCategoryLimit(nil, for: category, month: selectedMonth) }
                     )
                 }
             }
@@ -897,6 +977,111 @@ struct ContentView: View {
         }
     }
 
+    private var categoryBudgetsHeader: some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Category budgets")
+                    .font(.system(size: 29, weight: .bold, design: .rounded))
+                    .tracking(-0.7)
+                Text("Set limits, spend mindfully.")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                activeSheet = .settings
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 48, height: 48)
+                    .background(.thinMaterial, in: Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(colorScheme == .dark ? 0.09 : 0.65)))
+            }
+            .accessibilityLabel("Budget and appearance settings")
+        }
+        .padding(.top, 8)
+    }
+
+    private var categoryBudgetSummaryCard: some View {
+        HStack(spacing: 15) {
+            VStack(alignment: .leading, spacing: 7) {
+                Text("CATEGORY LIMITS")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .tracking(0.7)
+                    .foregroundStyle(.secondary)
+                Text(MoneyFormat.string(totalCategoryLimits))
+                    .font(.system(size: 35, weight: .bold, design: .rounded))
+                    .tracking(-1.2)
+                    .foregroundStyle(TrackerStyle.mint)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                    .contentTransition(.numericText())
+                Text("set")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Rectangle()
+                .fill(Color.primary.opacity(0.10))
+                .frame(width: 1, height: 67)
+
+            VStack(spacing: 5) {
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(TrackerStyle.mint)
+                    .frame(width: 48, height: 48)
+                    .background(TrackerStyle.mint.opacity(0.12), in: Circle())
+                Text(MoneyFormat.string(remainingAcrossCategoryLimits))
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .tracking(-0.8)
+                    .foregroundStyle(remainingAcrossCategoryLimits >= 0 ? TrackerStyle.mint : TrackerStyle.neonPink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                    .contentTransition(.numericText())
+                Text("left across categories")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .frame(minHeight: 154)
+        .background {
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.025, green: 0.22, blue: 0.15), Color(red: 0.045, green: 0.14, blue: 0.12)]
+                    : [Color(red: 0.89, green: 0.98, blue: 0.92), Color(red: 0.94, green: 0.99, blue: 0.96)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 25, style: .continuous).strokeBorder(.white.opacity(colorScheme == .dark ? 0.08 : 0.8)))
+        .shadow(color: TrackerStyle.mint.opacity(colorScheme == .dark ? 0.08 : 0.07), radius: 18, x: 0, y: 7)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var categoryBudgetList: some View {
+        VStack(spacing: 11) {
+            ForEach(ExpenseCategory.allCases) { category in
+                CategoryBudgetRow(
+                    category: category,
+                    spent: categorySpending(for: category),
+                    limit: store.categoryLimit(for: category, month: selectedMonth)
+                ) {
+                    activeSheet = .categoryBudget(category)
+                }
+            }
+        }
+    }
+
     private var bottomBar: some View {
         HStack(spacing: 4) {
             bottomAction(title: "Home", symbol: "house.fill", selected: selectedTab == .home) {
@@ -916,8 +1101,8 @@ struct ContentView: View {
                     .shadow(color: TrackerStyle.mint.opacity(0.28), radius: 12, x: 0, y: 7)
             }
             .accessibilityLabel("Add expense")
-            bottomAction(title: "Activity", symbol: "list.bullet", selected: false) {
-                activeSheet = .transactions
+            bottomAction(title: "Budgets", symbol: "slider.horizontal.3", selected: selectedTab == .categoryBudgets) {
+                selectedTab = .categoryBudgets
             }
         }
         .padding(.horizontal, 10)
@@ -943,6 +1128,232 @@ struct ContentView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct CategoryBudgetRow: View {
+    let category: ExpenseCategory
+    let spent: Double
+    let limit: Double?
+    let action: () -> Void
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var progress: Double {
+        guard let limit, limit > 0 else { return 0 }
+        return min(max(spent / limit, 0), 1)
+    }
+
+    private var statusLabel: String? {
+        guard let limit else { return nil }
+        if spent > limit { return "Over limit" }
+        if spent >= limit { return "At limit" }
+        if progress >= 0.8 { return "Near limit" }
+        return nil
+    }
+
+    private var remainingText: String {
+        guard let limit else { return "Set limit" }
+        if spent > limit { return "Over by \(MoneyFormat.string(spent - limit))" }
+        return "\(MoneyFormat.string(limit - spent)) left"
+    }
+
+    private var statusColor: Color {
+        guard let limit else { return TrackerStyle.mint }
+        if spent > limit { return TrackerStyle.neonPink }
+        if progress >= 0.8 { return TrackerStyle.gold }
+        return TrackerStyle.mint
+    }
+
+    private var accessibilitySummary: String {
+        guard let limit else {
+            return "Spent \(MoneyFormat.string(spent)); no limit set."
+        }
+        return "Spent \(MoneyFormat.string(spent)) of \(MoneyFormat.string(limit)); \(remainingText). \(statusLabel ?? "Within limit")."
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: category.symbol)
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(category.color)
+                    .frame(width: 54, height: 54)
+                    .background(category.color.opacity(colorScheme == .dark ? 0.17 : 0.10), in: Circle())
+
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack(spacing: 5) {
+                        Text(category.title)
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        Spacer(minLength: 2)
+                        if let statusLabel {
+                            VStack(alignment: .trailing, spacing: 1) {
+                                Text(statusLabel)
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(statusColor)
+                                Text(remainingText)
+                                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                                    .foregroundStyle(statusColor.opacity(0.9))
+                            }
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .fixedSize(horizontal: true, vertical: false)
+                        } else {
+                            Text(remainingText)
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .foregroundStyle(statusColor)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                        }
+                    }
+
+                    if let limit {
+                        HStack(spacing: 4) {
+                            Text(MoneyFormat.string(spent))
+                                .fontWeight(.semibold)
+                            Text("/")
+                                .foregroundStyle(.secondary)
+                            Text(MoneyFormat.string(limit))
+                                .foregroundStyle(.secondary)
+                            Spacer(minLength: 0)
+                        }
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(TrackerStyle.mint.opacity(colorScheme == .dark ? 0.20 : 0.13))
+                                Capsule()
+                                    .fill(statusColor)
+                                    .frame(width: geometry.size.width * progress)
+                            }
+                        }
+                        .frame(height: 8)
+                        .accessibilityHidden(true)
+                    } else {
+                        HStack(spacing: 4) {
+                            Text(MoneyFormat.string(spent))
+                                .fontWeight(.semibold)
+                            Text("spent · No limit")
+                                .foregroundStyle(.secondary)
+                            Spacer(minLength: 0)
+                        }
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+                    }
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .background(TrackerStyle.card(for: colorScheme).opacity(colorScheme == .dark ? 0.92 : 0.88), in: RoundedRectangle(cornerRadius: 23, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 23, style: .continuous).strokeBorder(.white.opacity(colorScheme == .dark ? 0.05 : 0.8)))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.08 : 0.035), radius: 16, x: 0, y: 6)
+            .contentShape(RoundedRectangle(cornerRadius: 23, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(category.title)
+        .accessibilityValue(accessibilitySummary)
+        .accessibilityHint("Set or edit this category's monthly limit")
+    }
+}
+
+private struct CategoryBudgetEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+
+    let category: ExpenseCategory
+    let currentLimit: Double?
+    let onSave: (Double) -> Void
+    let onRemove: () -> Void
+
+    @State private var amountText: String
+
+    init(category: ExpenseCategory, currentLimit: Double?, onSave: @escaping (Double) -> Void, onRemove: @escaping () -> Void) {
+        self.category = category
+        self.currentLimit = currentLimit
+        self.onSave = onSave
+        self.onRemove = onRemove
+        _amountText = State(initialValue: currentLimit.map {
+            $0 == $0.rounded() ? String(Int($0)) : String($0)
+        } ?? "")
+    }
+
+    private var parsedAmount: Double? {
+        Double(amountText.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces))
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 18) {
+                Text("MONTHLY LIMIT")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .tracking(0.8)
+                    .foregroundStyle(.secondary)
+
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("₹")
+                        .font(.system(size: 35, weight: .medium, design: .rounded))
+                        .foregroundStyle(TrackerStyle.mint)
+                    TextField("0", text: $amountText)
+                        .keyboardType(.decimalPad)
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .tracking(-1.2)
+                        .accessibilityLabel("Monthly category limit in rupees")
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 15)
+                .background(TrackerStyle.card(for: colorScheme), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+
+                Text("This limit is saved for the selected month and does not change your overall monthly budget.")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+
+                if currentLimit != nil {
+                    Button(role: .destructive) {
+                        onRemove()
+                        dismiss()
+                    } label: {
+                        Label("Remove limit", systemImage: "trash")
+                            .font(.system(size: 15, weight: .semibold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(15)
+                            .background(TrackerStyle.card(for: colorScheme), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 22)
+            .padding(.top, 24)
+            .background(TrackerStyle.background(for: colorScheme))
+            .navigationTitle(category.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        if let amount = parsedAmount, amount > 0 {
+                            onSave(amount)
+                        }
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .disabled((parsedAmount ?? 0) <= 0)
+                }
+            }
+        }
     }
 }
 
